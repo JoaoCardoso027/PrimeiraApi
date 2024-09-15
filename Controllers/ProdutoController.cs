@@ -1,56 +1,64 @@
-using Microsoft.AspNetCore.Mvc; // Importa as classes necessárias para o funcionamento do Controller (como [ApiController], [HttpGet], [HttpPost], etc.)
-using System.Collections.Generic; // Importa o namespace que contém as listas (List<T>), que usaremos para simular os dados
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 
-namespace MinhaApi.Controllers
-{
-    [ApiController] // Define que a classe será tratada como um Controller de API. Isso ativa validações automáticas e facilita o desenvolvimento de APIs REST.
-    [Route("api/produto")] // Define a rota para acessar esse controller. "api/[controller]" significa que a rota será baseada no nome da classe (no caso, /api/produto)
-    public class ProdutoController : ControllerBase // Esta classe herda de ControllerBase, o que permite que ela use métodos como Ok(), NotFound(), etc.
-    {
-        // Lista estática que simula uma base de dados de produtos.
-        // É estática para que a lista de produtos seja mantida em memória enquanto a aplicação está rodando.
-        private static List<string> produtos = new List<string> { "Produto 1", "Produto 2", "Produto 3" };
+namespace MinhaApi.Controllers{
+    [ApiController]
+    [Route("api/produto")]
+    public class ProdutoController : ControllerBase{
 
-        [HttpGet] // Define que esse método vai responder a requisições HTTP GET na rota "/api/produto"
-        public IEnumerable<string> Get() // O método retorna uma lista de strings (produtos) como resposta
-        {
-            return produtos; // Retorna a lista de produtos em formato JSON (automaticamente convertido pelo ASP.NET Core)
+        private static List<Produto> produtos = new List<Produto>{
+            new Produto { Id = 1, Nome = "Produto 1", Preco = 10.00m, Descricao = "Descrição do Produto 1"},
+            new Produto { Id = 2, Nome = "Produto 2", Preco = 20.00m, Descricao = "Descrição do Produto 2"}
+        };
+
+        [HttpGet]
+        public IEnumerable<Produto> Get(){
+            return produtos;
         }
 
-        [HttpPost] // Define que esse método vai responder a requisições HTTP POST na rota "/api/produto"
-        // O método POST é usado para adicionar um novo produto à lista
-        public IActionResult Post([FromBody] string produto) // O parâmetro [FromBody] indica que o produto será enviado no corpo da requisição
-        {
-            produtos.Add(produto); // Adiciona o novo produto à lista de produtos
-            return Ok(produto); // Retorna uma resposta HTTP 200 (OK) com o produto recém-adicionado
-        }
-
-        [HttpDelete("{id}")] // Define que esse método vai responder a requisições HTTP DELETE na rota "/api/produto/{id}"
-        // O {id} na rota significa que o ID do produto será passado como um parâmetro na URL
-        public IActionResult Delete(int id) // O parâmetro id é o índice do produto que será removido da lista
-        {
-            // Verifica se o ID é inválido (menor que 0 ou maior que o tamanho da lista)
-            if (id < 0 || id >= produtos.Count)
-            {
-                return NotFound(); // Retorna uma resposta HTTP 404 (Not Found) se o ID for inválido
+        [HttpGet("{id}")]
+        public IActionResult Get (int id){
+            var produto = produtos.FirstOrDefault(p => p.Id == id);
+            if (produto == null){
+                return NotFound();
             }
 
-            produtos.RemoveAt(id); // Remove o produto da lista no índice especificado pelo ID
-            return Ok(); // Retorna uma resposta HTTP 200 (OK) confirmando que o produto foi removido
+            return Ok(produto);
         }
-        // Método PUT: api/produto/{id}
-        // Atualiza o nome de um produto com base no ID (índice)
+
+        [HttpPost]
+        public IActionResult Post([FromBody] Produto novoProduto){
+            novoProduto.Id = produtos.Count + 1;
+            produtos.Add(novoProduto);
+
+            return CreatedAtAction(nameof(Get), new { id = novoProduto.Id }, novoProduto);
+        }
+
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string novoProduto){
-        // Verifica se o ID é inválido (menor que 0 ou maior que o número de produtos na lista)
-        if (id < 0 || id >= produtos.Count){
-        return NotFound(); // Retorna 404 Not Found se o ID for inválido
+        public IActionResult Put(int id, [FromBody] Produto produtoAtualizado){
+            var produto = produtos.FirstOrDefault(p => p.Id == id);
+            if (produto == null){
+                return NotFound();
+            }
+
+            produto.Nome = produtoAtualizado.Nome;
+            produto.Preco = produtoAtualizado.Preco;
+            produto.Descricao = produtoAtualizado.Descricao;
+
+            return Ok(produto);
         }
 
-        // Atualiza o produto existente na posição {id} com o novo nome
-        produtos[id] = novoProduto;
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id){
+            var produto = produtos.FirstOrDefault(p => p.Id == id);
+            if (produto == null){
+                return NotFound();
+            }
 
-        return Ok(novoProduto); // Retorna 200 OK com o produto atualizado
+            produtos.Remove(produto);
+            return Ok(produto);
         }
     }
 }
