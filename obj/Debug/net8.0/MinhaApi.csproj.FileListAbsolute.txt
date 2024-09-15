@@ -31,3 +31,4 @@ C:\Users\jpnet\pasta\MinhaApi\obj\Debug\net8.0\refint\MinhaApi.dll
 C:\Users\jpnet\pasta\MinhaApi\obj\Debug\net8.0\MinhaApi.pdb
 C:\Users\jpnet\pasta\MinhaApi\obj\Debug\net8.0\MinhaApi.genruntimeconfig.cache
 C:\Users\jpnet\pasta\MinhaApi\obj\Debug\net8.0\ref\MinhaApi.dll
+C:\Users\jpnet\pasta\MinhaApi\obj\Debug\net8.0\MinhaApi.sourcelink.json

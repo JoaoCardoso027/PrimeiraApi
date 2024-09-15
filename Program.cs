@@ -25,3 +25,5 @@ app.MapControllers();
 // app.UseHttpsRedirection();
 
 app.Run(); // Inicia a aplicação e faz o servidor começar a "ouvir" requisições
+
+// teste alteração

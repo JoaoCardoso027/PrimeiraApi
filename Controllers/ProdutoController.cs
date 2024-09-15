@@ -38,5 +38,19 @@ namespace MinhaApi.Controllers
             produtos.RemoveAt(id); // Remove o produto da lista no índice especificado pelo ID
             return Ok(); // Retorna uma resposta HTTP 200 (OK) confirmando que o produto foi removido
         }
+        // Método PUT: api/produto/{id}
+        // Atualiza o nome de um produto com base no ID (índice)
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody] string novoProduto){
+        // Verifica se o ID é inválido (menor que 0 ou maior que o número de produtos na lista)
+        if (id < 0 || id >= produtos.Count){
+        return NotFound(); // Retorna 404 Not Found se o ID for inválido
+        }
+
+        // Atualiza o produto existente na posição {id} com o novo nome
+        produtos[id] = novoProduto;
+
+        return Ok(novoProduto); // Retorna 200 OK com o produto atualizado
+        }
     }
 }
